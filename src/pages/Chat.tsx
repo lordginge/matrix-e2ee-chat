@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ShieldCheck, LogOut, MessageSquare, Wifi, WifiOff } from "lucide-react";
+import { ShieldCheck, LogOut, MessageSquare, Wifi, WifiOff, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useMatrix } from "@/hooks/useMatrixClient";
@@ -36,7 +36,11 @@ export default function Chat() {
   return (
     <div className="h-screen flex bg-slate-950 text-white overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-80 shrink-0 border-r border-slate-800 flex flex-col bg-slate-900/40">
+      <aside
+        className={`w-full md:w-80 shrink-0 border-r border-slate-800 flex-col bg-slate-900/40 ${
+          activeRoom ? "hidden md:flex" : "flex"
+        }`}
+      >
         <div className="p-3 border-b border-slate-800 flex items-center gap-2">
           <div className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5 text-emerald-400" />
@@ -81,10 +85,23 @@ export default function Chat() {
       </aside>
 
       {/* Main panel */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main
+        className={`flex-1 flex-col min-w-0 ${
+          activeRoom ? "flex" : "hidden md:flex"
+        }`}
+      >
         {activeRoom ? (
           <>
             <header className="h-14 border-b border-slate-800 flex items-center gap-3 px-4 shrink-0 bg-slate-900/40">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setActiveRoomId(null)}
+                className="text-slate-400 hover:text-white shrink-0 md:hidden"
+                title="Back to conversations"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
               <div className="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center text-sm font-semibold">
                 {activeRoom.name.slice(0, 2).toUpperCase()}
               </div>

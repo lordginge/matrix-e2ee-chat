@@ -15,7 +15,9 @@ import { useMatrix } from "@/hooks/useMatrixClient";
 
 export default function Login() {
   const { login, error } = useMatrix();
-  const [baseUrl, setBaseUrl] = useState("https://matrix.org");
+  const [baseUrl, setBaseUrl] = useState(
+    import.meta.env.VITE_DEFAULT_HOMESERVER || "https://matrix.org",
+  );
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
