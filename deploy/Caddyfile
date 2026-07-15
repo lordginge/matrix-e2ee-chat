@@ -1,0 +1,16 @@
+# ============================================================================
+# Caddy reverse proxy — terminates TLS automatically (Let's Encrypt).
+# Replace chat.example.com with your domain.
+#
+# This single domain serves BOTH the Matrix client-server API and the web app,
+# which keeps everything same-origin and avoids CORS issues.
+# ============================================================================
+
+chat.example.com {
+	# Matrix client-server API (used by this app, Element mobile, etc.)
+	reverse_proxy /_matrix/* 127.0.0.1:8008
+	reverse_proxy /_synapse/client/* 127.0.0.1:8008
+
+	# Everything else -> the web client
+	reverse_proxy 127.0.0.1:8080
+}

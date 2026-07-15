@@ -1,0 +1,38 @@
+# ============================================================================
+# Matrix E2EE Chat — self-hosted stack
+#
+#   - synapse: your own Matrix homeserver (you are the admin)
+#   - web:     this E2EE chat client, built and served by nginx
+#
+# Prerequisites: Docker + Docker Compose, a domain pointed at this server.
+# See docs/HOSTING.md for the full walkthrough.
+# ============================================================================
+
+services:
+  synapse:
+    image: ghcr.io/element-hq/synapse:latest
+    restart: unless-stopped
+    volumes:
+      - ./synapse-data:/data
+    environment:
+      SYNAPSE_SERVER_NAME: ${SYNAPSE_SERVER_NAME}
+      SYNAPSE_REPORT_STATS: "no"
+    ports:
+      # Only expose locally; the reverse proxy (Caddy/nginx) terminates TLS
+      - "127.0.0.1:8008:8008"
+    healthcheck:
+      test: ["CMD", "curl", "-fSs", "http://localhost:8008/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        # The login screen will default to your homeserver
+        VITE_DEFAULT_HOMESERVER: ${VITE_DEFAULT_HOMESERVER}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
