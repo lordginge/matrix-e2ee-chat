@@ -13,9 +13,33 @@ Encryption is handled client-side with the official [`matrix-js-sdk`](https://gi
 - Real-time message timeline with automatic decryption
 - Graceful handling of undecryptable messages (missing historical keys)
 - Session persistence across reloads (access token + device ID in localStorage, crypto keys in IndexedDB)
+- **Mobile-responsive** layout + PWA manifest ("Add to Home Screen")
 - Dark, security-focused UI (React + TypeScript + Tailwind + shadcn/ui)
 
-## Getting started
+## Self-hosting (your own server, you as admin)
+
+Everything you need is in [`deploy/`](deploy/) — a Docker Compose stack with
+Synapse (your private homeserver) + this web client, Caddy/nginx reverse
+proxy configs, and an invite-only setup where you control all accounts.
+
+**Full walkthrough: [docs/HOSTING.md](docs/HOSTING.md)**
+
+Quick version:
+
+```bash
+git clone https://github.com/<you>/matrix-e2ee-chat.git
+cd matrix-e2ee-chat/deploy && cp .env.example .env   # set your domain
+# generate synapse config, disable registration (see docs)
+docker compose up -d --build
+# create your admin account:
+docker compose exec synapse register_new_matrix_user \
+  -c /data/homeserver.yaml http://localhost:8008 --user you --admin
+```
+
+Mobile: open your domain in the phone browser (Add to Home Screen for an
+app-like install), or use the Element iOS/Android apps with your homeserver.
+
+## Development
 
 ```bash
 npm install
@@ -23,7 +47,11 @@ npm run dev      # http://localhost:3000
 npm run build    # production build in dist/
 ```
 
-You need a Matrix account — create one free at [app.element.io](https://app.element.io) (or any public homeserver), then sign in here with the same credentials. Devices/keys are managed by the SDK's Rust crypto layer.
+Set `VITE_DEFAULT_HOMESERVER` at build time to change the default homeserver
+on the login screen.
+
+You need a Matrix account — create one free at [app.element.io](https://app.element.io)
+(or your own server), then sign in with the same credentials.
 
 ## How it works
 
@@ -41,8 +69,10 @@ src/
   hooks/useRooms.ts          # joined/invited room list
   hooks/useTimeline.ts       # live timeline + back-pagination
   pages/Login.tsx            # homeserver + credentials form
-  pages/Chat.tsx             # main layout
+  pages/Chat.tsx             # main layout (responsive)
   components/chat/           # room list, messages, composer, new-chat dialog
+deploy/                      # Docker self-hosting stack
+docs/HOSTING.md              # full self-hosting guide
 ```
 
 ## Notes & limitations
